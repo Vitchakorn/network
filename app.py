@@ -6,12 +6,19 @@ IP = ['172.16.238.10', '172.16.238.11', '172.16.238.12', '172.16.238.13']
 host_name = socket.gethostname()
 host_address = socket.gethostbyname(host_name)
 addr_index = 0 
+graph = [[0, 10, 15, 20], [10, 0, 35, 25],
+        [15, 35, 0, 30], [20, 25, 30, 0]]
+total_cost = 0
 
 
 def handle_client(client_socket, client_address):
-    message = str(IP.index(host_address)) + str(IP.index(client_address[0]))
+    total_cost = 0
+    node_host = IP.index(host_address)
+    node_client = IP.index(client_address[0])
+    cost = graph[node_host][node_client]
+    total_cost += cost
+    message = str(node_host) + str(node_client) + " and cost is {}".format(total_cost) 
     client_socket.send(message.encode())
-    client_socket.close()
 
 
 def server(address):
