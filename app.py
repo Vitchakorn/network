@@ -1,58 +1,59 @@
 import socket
 import threading
 
-PORT = 1234
-IP = ["127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4"]
+PORT = 9000
+IP = ['172.16.238.10', '172.16.238.11', '172.16.238.12', '172.16.238.13']
 host_name = socket.gethostname()
 host_address = socket.gethostbyname(host_name)
-host_node = IP.index(host_address)
 addr_index = 0 
-total_cost = 0
 
 
-# def handle_client():
-    # message = "received node" + str(IP.index(host_address)) + " from " + host_address
-    # client_socket.send(message.encode())
-    # client_socket.close()
-    
+def handle_client(client_socket, client_address):
+    message = str(IP.index(host_address)) + str(IP.index(client_address[0]))
+    client_socket.send(message.encode())
+    client_socket.close()
+
 
 def server(address):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((address, PORT))
     server_socket.listen()
-    clients = 0 
+    clients = []
     while True:
         client_socket, client_address = server_socket.accept()
-        print("cli_address :" + client_address)
-        print("cli_socket :" + client_socket)
-        # client_thread = threading.Thread(
-        #     target=handle_client, args=(client_socket))
-        # client_thread.start()
-        message = "received node" + str(IP.index(host_address)) + " from " + host_address
-        client_socket.send(message.encode())
-        client_socket.close()
-        clients += 1
-        if clients >= 3:
+        client_thread = threading.Thread(
+            target=handle_client, args=(client_socket, client_address))
+        client_thread.start()
+        clients.append(client_address)
+        
+        if (len(clients) == len(IP) - 1):
             break
     server_socket.close()
 
+
 def client(address):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((address, PORT))
-    message = client_socket.recv(1024).encode('utf-8')
-    print(message)
-    client_socket.close()
+    while True:
+        try:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((address, PORT))
+            message = client_socket.recv(1024).decode()
+            print(message)
+            client_socket.close()
+            break
+        except Exception as e:
+            continue
+
 
 def main():
     global addr_index
-    if host_address == IP[host_node]:
-        server(host_address)
+    if host_address == IP[addr_index]:
+        server(IP[addr_index])
     else:
-        client(host_address)
+        client(IP[addr_index])
     
     addr_index += 1
 
-    if (addr_index != 4):
+    if (addr_index != len(IP)):
         main()
 
 main()

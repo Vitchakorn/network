@@ -1,13 +1,12 @@
-version: '3'
+version: "3"
 services:
-
   node0:
     build: .
     image: network
     container_name: node0
     networks:
       myapp:
-        ipv4_address: 127.0.0.1
+        ipv4_address: 172.16.238.10
 
   node1:
     build: .
@@ -15,7 +14,7 @@ services:
     container_name: node1
     networks:
       myapp:
-        ipv4_address: 127.0.0.1
+        ipv4_address: 172.16.238.11
 
   node2:
     build: .
@@ -23,7 +22,7 @@ services:
     container_name: node2
     networks:
       myapp:
-        ipv4_address: 127.0.0.1
+        ipv4_address: 172.16.238.12
 
   node3:
     build: .
@@ -31,7 +30,7 @@ services:
     container_name: node3
     networks:
       myapp:
-        ipv4_address: 127.0.0.1
+        ipv4_address: 172.16.238.13
 
 networks:
   myapp:
