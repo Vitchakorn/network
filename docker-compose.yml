@@ -6,7 +6,7 @@ services:
     container_name: node0
     networks:
       myapp:
-        ipv4_address: 172.16.238.10
+        ipv4_address: 172.28.5.1
 
   node1:
     build: .
@@ -14,7 +14,7 @@ services:
     container_name: node1
     networks:
       myapp:
-        ipv4_address: 172.16.238.11
+        ipv4_address: 172.28.5.2
 
   node2:
     build: .
@@ -22,7 +22,7 @@ services:
     container_name: node2
     networks:
       myapp:
-        ipv4_address: 172.16.238.12
+        ipv4_address: 172.28.5.3
 
   node3:
     build: .
@@ -30,11 +30,11 @@ services:
     container_name: node3
     networks:
       myapp:
-        ipv4_address: 172.16.238.13
+        ipv4_address: 172.28.5.4
 
 networks:
   myapp:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.16.238.0/24
+        - subnet: 172.28.5.0/16
