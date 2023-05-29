@@ -1,6 +1,7 @@
 import socket
 import threading
 import time 
+from itertools import permutations
 
 PORT = 9000
 IP = ['172.28.5.1', '172.28.5.2', '172.28.5.3', '172.28.5.4']
@@ -24,49 +25,37 @@ def client(address):
             continue
 
 
+def calculate_total_distance(path, graph):
+    total_distance = 0
+    num_cities = len(path)
+    for i in range(num_cities - 1):
+        source = path[i]
+        destination = path[i+1]
+        total_distance += graph[source][destination]
+    # Add the distance from the last city back to the starting city
+    total_distance += graph[path[num_cities - 1]][path[0]]
+    return total_distance
+
+
 def tsp(graph):
-    n = len(graph)
-    dp = [[float('inf')] * n for _ in range(1 << n)]
-    dp[1][0] = 0
-
-    for mask in range(1, 1 << n):
-        for current in range(n):
-            if mask & (1 << current) == 0:
-                continue
-            for prev in range(n):
-                if mask & (1 << prev) == 0:
-                    continue
-                dp[mask][current] = min(dp[mask][current], dp[mask ^ (1 << current)][prev] + graph[prev][current])
-
-    min_cost = float('inf')
-    last_city = -1
-    for i in range(1, n):
-        cost = dp[(1 << n) - 1][i] + graph[i][0]
-        if cost < min_cost:
-            min_cost = cost
-            last_city = i
-            
-    path = [0]
-    mask = (1 << n) - 1
-    while last_city != 0:
-        path.append(last_city)
-        mask ^= (1 << last_city)
-        for prev in range(n):
-            if mask & (1 << prev) == 0:
-                continue
-            if dp[mask][last_city] == dp[mask ^ (1 << last_city)][prev] + graph[prev][last_city]:
-                last_city = prev
-                break
-    path.append(0)
-
-    return path, min_cost
+    num_cities = len(graph)
+    # Generate all possible permutations of cities
+    all_paths = permutations(range(num_cities))
+    min_distance = float('inf')
+    optimal_path = None
+    for path in all_paths:
+        distance = calculate_total_distance(path, graph)
+        if distance < min_distance:
+            min_distance = distance
+            optimal_path = path
+    return optimal_path, min_distance
 
 
 def sending(server, address):
     node_host = IP.index(host_address)
     node_client = IP.index(address[0])
     cost = graph[node_host][node_client]
-    message = str(node_client) + str(node_host) + " cost = {} ".format(cost) + str(address[0]) + str(host_address)
+    message = str(node_client) + str(node_host) + " cost = {} ".format(cost)
     server.send(message.encode())
 
 
@@ -90,7 +79,6 @@ def server(address):
 
 def main():
     global index
-    print(index)
     if host_address == IP[index]:
         server(IP[index])
     else:
