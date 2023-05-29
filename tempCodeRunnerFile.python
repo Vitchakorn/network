@@ -1,0 +1,5 @@
+cities = [(0, 0), (1, 1), (2, 3), (5, 2)]  # List of city coordinates
+optimal_route, min_distance = tsp(cities)
+
+print("Optimal Route:", optimal_route)
+print("Minimum Distance:", min_distance)
